@@ -1,0 +1,469 @@
+<!-- Jonathan Hersh - jhersh@salesforce.com - Feb '11 -->
+<apex:page tabstyle="GroupMaster__tab" sidebar="false" controller="groupMaster" standardstylesheets="false">
+	<apex:includescript value="{!URLFOR( $Resource.groupMaster, 'jquery-1.4.4.min.js' )}" />
+	<apex:includescript value="{!URLFOR( $Resource.groupMaster, 'jquery-ui-1.8.9.custom.min.js' )}" />
+	<apex:stylesheet value="{!URLFOR( $Resource.groupMaster, 'jquery-ui-1.8.9.custom.css' )}" />
+
+	<apex:sectionheader title="GroupMaster" />
+	
+	<apex:form id="theform">
+	
+	<apex:actionfunction name="addGroupAF" action="{!addGroup}" rerender="sourceGroups,messages" oncomplete="checkMessages();" />
+	<apex:actionfunction name="clearGroupsAF" action="{!clearGroups}" rerender="sourceGroups,messages" oncomplete="checkMessages();" />
+	<apex:actionfunction name="selectedSourceAF" action="{!selectedSource}" rerender="newGroupName,messages" oncomplete="checkMessages();" />
+	<apex:actionfunction name="removeGRPSourceAF" action="{!removeGRP}" rerender="memberSources,messages" oncomplete="checkMessages();" >
+		<apex:param name="IDToRemove" assignto="{!IDToRemove}" value="" />
+	</apex:actionfunction>
+	<apex:actionfunction name="removeGroupAF" action="{!removeGroup}" rerender="sourceGroups,messages" oncomplete="checkMessages();" >
+		<apex:param name="IDToRemove" assignto="{!IDToRemove}" value="" />
+	</apex:actionfunction>
+	<apex:actionfunction name="groupMasterAF" action="{!launchBatch}" rerender="batchBar,navButtons,messages" oncomplete="progressUpdate(); checkMessages();" />
+	<apex:actionfunction name="resetAF" action="{!reset}" rerender="sourceGroup,sourceGroups,copySource,messages,newGroupName,memberSources,idSelects,destGroup,destGroupID" oncomplete="toggleBatchView();" />
+	
+	<apex:outputpanel id="messages" >
+		<div id="messages">
+			<apex:messages />
+		</div>
+	</apex:outputpanel>
+	<div id="about" style="display:none">
+		<p>GroupMaster is <a target="_blank" href="https://sites.secure.force.com/appexchange/listingDetail?listingId=a0N30000003Jj1aEAC">free on the AppExchange!</a></p><br/>
+		<p>Questions, comments, suggestions? Email <a href="mailto:jhersh@salesforce.com?subject=Groupmaster">Jonathan Hersh</a>.</p>
+	</div>
+	
+	<div id="darkDiv">
+		<div id="batchDiv" style="display:none">
+			<div style="margin: 0 auto; text-align:center">
+				<h1 style="color:white; font-size: 18px; font-family: Verdana;" id="status"></h1><br/>
+			
+				<apex:outputpanel id="batchBar" >
+					<script type="text/javascript">
+						function progressUpdate() {
+							if( {!jobsExecuted <= BatchCount + 1} ) {
+								jQuery("#calcBar").progressbar( { value : ( {!jobsExecuted} * 100 ) / {!BatchCount + 1} } );
+								jQuery("#status").html("GroupMaster is underway...");
+							} else {
+								jQuery("#status").html("GroupMaster is complete!");
+								jQuery("#setupSwitcher").add("#gotoGroup").button().fadeIn();
+								jQuery("#calcBar").fadeOut();
+							}
+						}
+					</script>
+					<div id="calcBar" style="height: 22px; width: 300px; margin: 0 auto;"></div>
+					<div style="clear:both"></div>
+					<p><apex:outputtext value="{!statusMsg}" rendered="{!jobsExecuted <= BatchCount + 1}" /></p>
+					
+					<br/><br/>					
+					<apex:actionpoller action="{!launchBatch}" interval="5" rerender="batchBar" rendered="{!AND( jobsExecuted > 0, jobsExecuted <= BatchCount + 1)}" oncomplete="progressUpdate();" />
+				</apex:outputpanel>
+				<apex:outputpanel id="navButtons">
+					<a href="#" id="setupSwitcher" style="display:none" onclick="resetAF();">&larr; Back to GroupMaster</a>&nbsp;
+					<a href="/{!targetURL}" style="display:none" id="gotoGroup" >View Group &rarr;</a>
+				</apex:outputpanel>
+			</div>
+		</div>
+		<div id="setupDiv">
+		<div id="divSub">
+			<div id="numWrapper">
+				<div id="bigNum">1</div>
+				<div id="numText">select operation</div>
+			</div>
+			<div id="contentWrapper">
+				<div id="buttonSet" class="numContent">
+					<apex:selectradio id="optype" value="{!operation}" onchange="switchOp();" >
+						<apex:selectoptions value="{!Operations}" />
+					</apex:selectradio>
+					<div style="clear:both"></div>
+					<div id="helperText"></div>
+				</div>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+		<div id="divSub">
+			<div id="numWrapper">
+				<div id="bigNum">2</div>
+				<div id="numText">select options</div>
+			</div>
+			<div id="contentWrapper">
+				<div id="mergeContent" class="opContent">
+					<div class="numContent">
+						<p>Select one or more source groups.</p><br/>
+						<apex:outputpanel id="sourceGroup">
+						<div id="sourceGroup" style="float:left; margin-right: 10px; padding-top: 5px;"><apex:selectlist value="{!sourceGroup}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!GroupList}" />
+							<apex:actionsupport event="onchange" action="{!addGroup}" rerender="sourceGroups" />
+						</apex:selectlist></div>
+						</apex:outputpanel>
+						<a href="#" id="clearGroups" onclick="clearGroupsAF();" style="float:right">Clear</a>
+						<div style="clear:both"></div>
+						<apex:outputpanel id="sourceGroups">
+							<div id="sourceGroups"><apex:repeat value="{!sourceGroups}" var="g">
+								<div id="{!g.groupID}">
+									<a href="#" onclick="removeGroup('{!g.groupID}');"><apex:image value="{!URLFOR( $Resource.groupMaster, 'orangex.png' )}" height="16" width="16" /></a>&nbsp;
+									<apex:image value="{!g.photoURL}" height="24" width="24" />&nbsp;
+									<apex:outputlink target="_blank" value="/{!g.groupID}" title="{!g.groupName}" >{!g.groupName} ({!g.members} member{!if(g.members > 1, "s", "")})</apex:outputlink><br/>
+								</div>
+							</apex:repeat></div>
+						</apex:outputpanel>
+					</div>
+					<div class="numContent">
+						<p>Select the destination group.</p><br/>
+						<apex:outputpanel id="destGroup">
+						<div id="destGroup"><apex:selectlist value="{!destGroup}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!GroupList}" />
+						</apex:selectlist></div>
+						</apex:outputpanel>
+					</div>
+					<div style="clear:left"></div>
+					<div class="numContent" style="margin-left: 165px">
+						<apex:inputcheckbox id="deleteSources" value="{!deleteSources}" />
+						<apex:outputlabel styleclass="orange" for="deleteSources" value="Delete source group(s) after merge" />
+					</div>
+				</div>
+				<div id="copyContent" class="opContent">
+					<div class="numContent">
+						<p>Select a source group.</p><br/>
+						<apex:outputpanel id="copySource">
+						<div id="copySource"><apex:selectlist value="{!copySource}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!GroupList}" />
+							<apex:actionsupport event="onchange" action="{!selectedSource}" rerender="newGroupName,messages" oncomplete="checkMessages();" />
+						</apex:selectlist></div>
+						</apex:outputpanel>
+					</div>
+					<div class="numContent">
+						<p>Name the new group.</p><br/>
+						<apex:outputpanel id="newGroupName">
+							<div id="newName"><apex:inputtext value="{!newName}" size="45" maxlength="80" /></div>
+						</apex:outputpanel>
+					</div>
+					<div style="clear:left"></div>
+					<div class="numContent" style="margin-left: 165px">
+						<apex:inputcheckbox id="copyPosts" value="{!doNotCopyPosts}" />
+						<apex:outputlabel styleclass="orange" for="copyPosts" value="Do not copy posts and comments (only members will be copied)" />
+					</div>
+				</div>
+				<div id="memberContent" class="opContent">
+					<div class="numContent">
+						<p>Select one or more source roles, profiles, and groups.</p><br/>
+						<apex:outputpanel id="idSelects">
+						<apex:selectlist id="sourceGroupID" value="{!sourceGroupID}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!GroupList}" />
+							<apex:actionsupport event="onchange" action="{!addGRP}" rerender="memberSources" >
+								<apex:param name="whichSelect" assignto="{!whichSelect}" value="1" />
+							</apex:actionsupport>
+						</apex:selectlist><br/><br/>
+						<apex:selectlist id="sourceRoleID" value="{!sourceRoleID}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!Roles}" />
+							<apex:actionsupport event="onchange" action="{!addGRP}" rerender="memberSources" >
+								<apex:param name="whichSelect" assignto="{!whichSelect}" value="2" />
+							</apex:actionsupport>
+						</apex:selectlist><br/><br/>
+						<apex:selectlist id="sourceProfileID" value="{!sourceProfileID}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!Profiles}" />
+							<apex:actionsupport event="onchange" action="{!addGRP}" rerender="memberSources" >
+								<apex:param name="whichSelect" assignto="{!whichSelect}" value="3" />
+							</apex:actionsupport>
+						</apex:selectlist><br/>
+						</apex:outputpanel>
+						<div style="clear:both"></div>
+						<apex:outputpanel id="memberSources">
+							<div id="memberSources"><apex:repeat value="{!memberSources}" var="g">
+								<div id="{!g.rpID}">
+									<a href="#" onclick="removeGRPSource('{!g.rpID}');"><apex:image value="{!URLFOR( $Resource.groupMaster, 'orangex.png' )}" height="16" width="16" /></a>&nbsp;
+									<strong>{!g.rpType}: </strong>
+									<apex:outputlink target="_blank" value="/{!g.rpID}" title="{!g.rpName}">{!g.rpName}</apex:outputlink><br/>
+								</div>
+							</apex:repeat></div>
+						</apex:outputpanel>
+					</div>
+					<div class="numContent">
+						<p>Select the destination group.</p><br/>
+						<apex:outputpanel id="destGroupID">
+						<div id="destGroupID"><apex:selectlist value="{!destGroupID}" size="1" multiselect="false" >
+							<apex:selectoptions value="{!GroupList}" />
+						</apex:selectlist></div>
+						</apex:outputpanel>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+		<div id="divSub">
+			<div id="numWrapper">
+				<div id="bigNum">3</div>
+				<div id="numText"></div>
+			</div>
+			<div id="contentWrapper">
+				<div class="numContent">
+					<a href="#" id="groupMaster" onclick="GroupMaster();">GroupMaster!</a>
+				</div>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+		</div>
+	</div>
+	
+	<a href="#" onclick="about();">About</a>
+	
+	</apex:form>
+	
+	<script type="text/javascript">
+		jQuery.noConflict();
+		
+		function GroupMaster() {
+			var op = jQuery("#buttonSet input[type=radio]:checked").val();
+			var fields = jQuery( [] ).add("#copySource select").add("#newName input").add("#sourceGroup select").add("#destGroup select").add("#destGroupID select");
+			
+			fields.removeClass("ui-state-error");
+			
+			// JS validation FTW
+			if( op == "{!JSINHTMLENCODE(MERGE_OP)}" ) {
+				// did we select at least one source group?
+				if( jQuery("#sourceGroups").html().trim() == "" ) {
+					jQuery("#sourceGroup select").addClass("ui-state-error");
+					jQuery("#sourceGroup select").focus();
+					return;
+				}
+				
+				// did we select at least one destination group?
+				if( jQuery("#destGroup select").val() == "" ) {
+					jQuery("#destGroup select").addClass("ui-state-error");
+					jQuery("#destGroup select").focus();
+					return;
+				}
+			} else if( op == "{!JSINHTMLENCODE(COPY_OP)}" ) {
+				// did we select a source group?
+				if( jQuery("#copySource select").val() == "" ) {
+					jQuery("#copySource select").addClass( "ui-state-error" );
+					jQuery("#copySource select").focus();
+					return;
+				}
+				
+				// did we enter a name for the new group?
+				var name = jQuery("#newName input").val();
+				
+				if( !name || name == "" || name.length < 3 ) {
+					jQuery("#newName input").addClass( "ui-state-error" );
+					jQuery("#newName input").focus();
+					return;
+				}
+			} else if( op == "{!JSINHTMLENCODE(MEMBER_OP)}" ) {
+				// Did we select at least one source?
+				if( jQuery("#memberSources").html().trim() == "" ) {
+					return;
+				}
+				
+				// Did we select a target group?
+				if( jQuery("#destGroupID select").val() == "" ) {
+					jQuery("#destGroupID select").addClass( "ui-state-error" );
+					jQuery("#destGroupID select").focus();
+					return;
+				}
+			}	
+			
+			// JS Validation all clear. Let's do this thing
+			groupMasterAF();
+			toggleBatchView();
+		}
+		
+		function toggleBatchView() {
+			if( jQuery("#setupDiv").css('display') != 'none' ) {
+				jQuery("#setupDiv").fadeOut();
+				setTimeout("jQuery('#batchDiv').fadeIn(200);", 200);
+			} else {
+				jQuery("#batchDiv").fadeOut();
+				setTimeout("jQuery('#setupDiv').fadeIn(200);", 200);
+			}
+		}
+		
+		function removeGRPSource( rpID ) {
+			jQuery( rpID ).fadeOut();
+			
+			removeGRPSourceAF( rpID );
+		}
+		
+		function removeGroup( groupID ) {
+			jQuery( groupID ).fadeOut();
+			
+			removeGroupAF( groupID );
+		}
+		
+		jQuery(document).ready( function() {
+			loadMe();
+		});
+		
+		function loadMe() {
+			switchOp();
+			
+			// buttons
+			var buttons = jQuery( [] ).add( "#addGroup" ).add( "#clearGroups" ).add( "#groupMaster" ).add("#setupSwitcher").add("#gotoGroup");
+			
+			jQuery("#buttonSet").buttonset();
+			buttons.button();
+			
+			checkMessages();
+		}
+		
+		function about() {
+			jQuery("#about").dialog( { modal: false, height: 200, width: 300, title: "About GroupMaster", resizable: false } );
+		}
+		
+		function checkMessages() {
+			if( jQuery("#messages").html().trim() != "" )
+				jQuery("#messages").dialog({ title : "Something went wrong. Sorry!", width: 400 });
+		}
+		
+		function switchOp() {
+			var op = jQuery("#buttonSet input[type=radio]:checked").val();
+		
+			helperText( op );
+			
+			jQuery(".opContent:visible").hide();
+			
+			if( op == "{!JSINHTMLENCODE(MERGE_OP)}" )
+				jQuery("#mergeContent").fadeIn(200);
+			else if( op == "{!JSINHTMLENCODE(COPY_OP)}" ) {
+				if( jQuery("#newName input").val() == "" )
+					selectedSourceAF();
+					
+				jQuery("#copyContent").fadeIn(200);
+			} else if( op == "{!JSINHTMLENCODE(MEMBER_OP)}" ) {
+				jQuery("#memberContent").fadeIn(200);
+			}
+		}
+		
+		function helperText( op ) {
+			var text;
+			
+			if( op == "{!JSINHTMLENCODE(MERGE_OP)}" )
+				text = "Merge posts, comments, and members from one or more source groups into one destination group.";
+			else if( op == "{!JSINHTMLENCODE(COPY_OP)}" )
+				text = "Copy a group, preserving posts, comments, and members.";
+			else if( op == "{!JSINHTMLENCODE(MEMBER_OP)}" )
+				text = "Add everyone from a role, profile, or source group to a target group.";
+			
+			jQuery("#helperText").hide();
+			jQuery("#helperText").html('<p id="helperP">' + text + '</p>');
+			jQuery("#helperText").fadeIn(200);
+		}
+	</script>	
+	
+	<style type="text/css">
+		#darkDiv {
+			min-height: 200px;
+			min-width: 50%;
+			-moz-border-radius: 15px;
+			border-radius: 15px;
+			background-color: #464646;
+			padding: 20px;
+		}
+		
+		#divSub {
+			width: 100%;
+			min-height: 60px;
+			margin: 0 0 50px 0;
+		}
+		
+		#numWrapper {
+			width: 180px;
+			display: inline;
+			margin-right: 10px;
+		}
+		
+		#contentWrapper {
+			display: inline;
+		}
+		
+		#bigNum {
+			color: orange;
+			font-family: Courier;
+			font-size: 48px;
+			float:left;
+			padding-top: 15px;
+		}
+		
+		#numText {
+			color: gray;
+			font-family: Verdana;
+			font-size: 13px;
+			float: left;
+			margin-left: 5px;
+			margin-top: 20px;
+			width: 120px;
+			padding-top: 15px;
+		}
+		
+		.numContent {
+			float: left;
+			margin-left: 40px;
+			
+			-moz-border-radius: 15px;
+			border-radius: 15px;
+			background-color: white;
+			padding: 20px;
+			margin: 10px;
+		}
+		
+		p, .orange {
+			font-family: Verdana;
+			color: orange;
+			font-size: 14px;
+			margin: 0;
+		}
+		
+		p#helperP {
+			margin-top: 1em;
+			margin-left: 5px;
+		}
+		
+		/* Component containers
+		----------------------------------*/
+		.ui-widget { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1.1em; }
+		.ui-widget .ui-widget { font-size: 1em; }
+		.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 1em; }
+		.ui-widget-content { border: 1px solid #7e7783; background: #3d3644 url({!URLFOR( $Resource.groupMaster, 'ui-bg_gloss-wave_30_3d3644_500x100.png' )}) 50% top repeat-x; color: #ffffff; }
+		.ui-widget-content a { color: #ffffff; }
+		.ui-widget-header { border: 1px solid #231d2b; background: #30273a url({!URLFOR( $Resource.groupMaster, 'ui-bg_highlight-soft_25_30273a_1x100.png' )}) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+		.ui-widget-header a { color: #ffffff; }
+		
+		.ui-progressbar-value { background-image: url({!URLFOR( $Resource.groupMaster, 'pbar-ani.gif' )}) }
+		
+		/* Interaction states
+		----------------------------------*/
+		.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #dcd9de; background: #dcd9de url({!URLFOR( $Resource.groupMaster, 'ui-bg_highlight-soft_100_dcd9de_1x100.png' )}) 50% 50% repeat-x; font-weight: bold; color: #665874; }
+		.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #665874; text-decoration: none; }
+		.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #d1c5d8; background: #eae6ea url({!URLFOR( $Resource.groupMaster, 'ui-bg_highlight-soft_100_eae6ea_1x100.png' )}) 50% 50% repeat-x; font-weight: bold; color: #734d99; }
+		.ui-state-hover a, .ui-state-hover a:hover { color: #734d99; text-decoration: none; }
+		.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #7e7783; background: #5f5964 url({!URLFOR( $Resource.groupMaster, 'ui-bg_highlight-soft_45_5f5964_1x100.png' )}) 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
+		.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #ffffff; text-decoration: none; }
+		.ui-widget :active { outline: none; }
+		
+		/* Interaction Cues
+		----------------------------------*/
+		.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight  {border: 1px solid #ffdb1f; background: #fafafa url({!URLFOR( $Resource.groupMaster, 'ui-bg_flat_55_fafafa_40x100.png' )}) 50% 50% repeat-x; color: #333333; }
+		.ui-state-highlight a, .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #333333; }
+		.ui-state-error, .ui-widget-content .ui-state-error, .ui-widget-header .ui-state-error {border: 1px solid #994d53; background: #994d53 url({!URLFOR( $Resource.groupMaster, 'ui-bg_flat_55_994d53_40x100.png' )}) 50% 50% repeat-x; color: #ffffff; }
+		.ui-state-error a, .ui-widget-content .ui-state-error a, .ui-widget-header .ui-state-error a { color: #ffffff; }
+		.ui-state-error-text, .ui-widget-content .ui-state-error-text, .ui-widget-header .ui-state-error-text { color: #ffffff; }
+		.ui-priority-primary, .ui-widget-content .ui-priority-primary, .ui-widget-header .ui-priority-primary { font-weight: bold; }
+		.ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
+		.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
+		
+		/* Icons 
+		-----------------------*/
+		
+		/* states and images */
+		.ui-icon { width: 16px; height: 16px; background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_ffffff_256x240.png' )}); }
+		.ui-widget-content .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_ffffff_256x240.png' )}); }
+		.ui-widget-header .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_a8a3ae_256x240.png' )}); }
+		.ui-state-default .ui-icon { background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_8d78a5_256x240.png' )}); }
+		.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_734d99_256x240.png' )}); }
+		.ui-state-active .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_454545_256x240.png' )}); }
+		.ui-state-highlight .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_8d78a5_256x240.png' )}); }
+		.ui-state-error .ui-icon, .ui-state-error-text .ui-icon {background-image: url({!URLFOR( $Resource.groupMaster, 'ui-icons_ebccce_256x240.png' )}); }
+		
+		/* Overlays */
+		.ui-widget-overlay { background: #eeeeee url({!URLFOR( $Resource.groupMaster, 'ui-bg_flat_0_eeeeee_40x100.png' )}) 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
+		.ui-widget-shadow { margin: -4px 0 0 -4px; padding: 4px; background: #aaaaaa url({!URLFOR( $Resource.groupMaster, 'ui-bg_flat_0_aaaaaa_40x100.png' )}) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; }	
+	</style>
+
+</apex:page>
