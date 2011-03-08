@@ -7,8 +7,8 @@ GroupMaster uses batch apex to merge or copy even the largest Chatter groups, pr
 
 The resources/ dir is intended to be zipped and loaded into Salesforce as a static resource; it is included here unzipped for easier browsing.
 
-GroupMaster is available free on the [https://sites.secure.force.com/appexchange/listingDetail?listingId=a0N30000003Jj1aEAC](AppExchange)!
+GroupMaster is available free on the [AppExchange](https://sites.secure.force.com/appexchange/listingDetail?listingId=a0N30000003Jj1aEAC)!
 
-by [mailto:jhersh@salesforce.com](Jonathan Hersh).
+by [Jonathan Hersh](mailto:jhersh@salesforce.com).
 
 *Copyright 2011 salesforce.com.*
