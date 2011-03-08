@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableActivities>false</enableActivities>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <fields>
+        <fullName>Active__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Check this box when you&apos;re ready to distribute the results of this snapshot to your users on the My Influence tab.</inlineHelpText>
+        <label>Active</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Average_Comments_Created__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Comments_Created_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Comments Created</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Average_Comments_Received__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Comments_Received_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Comments Received</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Average_Followers__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Followers_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Followers</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Average_Influence__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Influence_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Influence</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>3</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Average_Posts_Created__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Posts_Created_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Posts Created</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Average_Posts_Received__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Total_Records__c &gt; 0, Posts_Received_Sum__c /  Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Average Posts Received</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Avg_Day_Comments_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Avg. Day Interaction Sum</label>
+        <summarizedField>Influence__c.Comments_Per_Day__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Avg_Interactions_Post__c</fullName>
+        <externalId>false</externalId>
+        <formula>if(  Posts_Created_Sum__c &gt; 0, ( Comments_Received_Sum__c +  Likes_Received_Sum__c ) /  Posts_Created_Sum__c , 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Avg. Interactions/Post</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Comments_Created_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Comments Created Sum</label>
+        <summarizedField>Influence__c.Comments_Created__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Comments_Received_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Comments Received Sum</label>
+        <summarizedField>Influence__c.Comments_Received__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>End_Time__c</fullName>
+        <defaultValue>now()</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Ending boundary of Chatter data to be used in this calculation.</inlineHelpText>
+        <label>End Time</label>
+        <required>true</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Followers_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Followers Sum</label>
+        <summarizedField>Influence__c.Followers__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Include_Custom_Object_Feeds__c</fullName>
+        <defaultValue>true</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>If checked, Influence calculations include Chatter posts, comments, and following relationships on custom objects.</inlineHelpText>
+        <label>Include Custom Object Feeds</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Influence_Sum__c</fullName>
+        <defaultValue>0</defaultValue>
+        <externalId>false</externalId>
+        <label>Influence Sum</label>
+        <precision>12</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Jobs_Executed__c</fullName>
+        <defaultValue>0</defaultValue>
+        <externalId>false</externalId>
+        <label>Jobs Executed</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Leaderboard_Status__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>How should the results of this Snapshot appear on the Leaderboard on the My Chatter Influence page?</inlineHelpText>
+        <label>Leaderboard Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Display Global Ranks and ChatterRanks</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Display ChatterRanks Only</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Display Global Ranks Only</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>No Leaderboard</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Likes_Received_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Likes Received Sum</label>
+        <summarizedField>Influence__c.Likes_Received__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Maximum_Concurrent_Batches__c</fullName>
+        <defaultValue>5</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>The maximum number of simultaneous Apex Batch jobs to launch during this calculation. If you&apos;re not sure what this is, leave it at 5.</inlineHelpText>
+        <label>Maximum Concurrent Batches</label>
+        <precision>2</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Comments_Created__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Comments Created</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Comments_Received__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Comments Received</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Day_Comments__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Day Interactions</label>
+        <precision>12</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Followers__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Followers</label>
+        <precision>5</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Influence__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Influence</label>
+        <precision>13</precision>
+        <required>false</required>
+        <scale>3</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Interactions_Post__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Interactions/Post</label>
+        <precision>12</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Likes_Received__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Likes Received</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Posts_Created__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Posts Created</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Median_Posts_Received__c</fullName>
+        <externalId>false</externalId>
+        <label>Median Posts Received</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Overall_ACD__c</fullName>
+        <externalId>false</externalId>
+        <formula>if( Total_Records__c &gt; 0, Avg_Day_Comments_Sum__c / Total_Records__c, 0 )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Overall Average Interaction Received/Day</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Posts_Created_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Posts Created Sum</label>
+        <summarizedField>Influence__c.Posts_Created__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Posts_Received_Sum__c</fullName>
+        <externalId>false</externalId>
+        <label>Posts Received Sum</label>
+        <summarizedField>Influence__c.Posts_Received__c</summarizedField>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>sum</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Records_to_Exclude__c</fullName>
+        <externalId>false</externalId>
+        <inlineHelpText>A comma-separated list of IDs to exclude from this calculation. User IDs, record IDs, Group IDs all work - any chatter-enabled object ID.</inlineHelpText>
+        <label>Records to Exclude</label>
+        <length>32000</length>
+        <type>LongTextArea</type>
+        <visibleLines>4</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Start_Time__c</fullName>
+        <defaultValue>now() - 180</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Beginning boundary of Chatter data to be used in this calculation.</inlineHelpText>
+        <label>Start Time</label>
+        <required>true</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName>
+        <externalId>false</externalId>
+        <label>Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Ready</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Loading Chatter Data</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sorting Data</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Finalizing Influence</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Complete</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Total_Jobs__c</fullName>
+        <defaultValue>1</defaultValue>
+        <externalId>false</externalId>
+        <label>Total Jobs</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Total_Records__c</fullName>
+        <externalId>false</externalId>
+        <label>Total Influence Records</label>
+        <summaryForeignKey>Influence__c.Influence_Parent__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Track_Influence_Reports__c</fullName>
+        <defaultValue>true</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>If checked, the app will track which users request their scores from this Influence Snapshot on the My Influence page.</inlineHelpText>
+        <label>Track Influence Emails</label>
+        <type>Checkbox</type>
+    </fields>
+    <label>Influence Snapshot</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>Active__c</columns>
+        <columns>Total_Records__c</columns>
+        <columns>Median_Influence__c</columns>
+        <columns>Comments_Created_Sum__c</columns>
+        <columns>Comments_Received_Sum__c</columns>
+        <columns>Posts_Created_Sum__c</columns>
+        <columns>Posts_Received_Sum__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <displayFormat>IP-{0000}</displayFormat>
+        <label>Influence Parent Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Influence Snapshots</pluralLabel>
+    <searchLayouts>
+        <customTabListAdditionalFields>Active__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Total_Records__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>CREATED_DATE</customTabListAdditionalFields>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+    <startsWith>Vowel</startsWith>
+    <validationRules>
+        <fullName>End_After_Start</fullName>
+        <active>true</active>
+        <errorConditionFormula>if( AND( NOT( ISNULL( Start_Time__c ) ), NOT( ISNULL( End_Time__c ) ) ), End_Time__c &lt;= Start_Time__c, false )</errorConditionFormula>
+        <errorMessage>End datetime must be greater than the start datetime for this snapshot.</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>Valid_Concurrent_Batches</fullName>
+        <active>true</active>
+        <errorConditionFormula>or(  Maximum_Concurrent_Batches__c &lt; 1, Maximum_Concurrent_Batches__c &gt; 5 )</errorConditionFormula>
+        <errorDisplayField>Maximum_Concurrent_Batches__c</errorDisplayField>
+        <errorMessage>Maximum concurrent batches must be a number between 1 and 5.</errorMessage>
+    </validationRules>
+</CustomObject>
