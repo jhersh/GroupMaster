@@ -337,7 +337,7 @@ public with sharing class groupMaster {
         
         so.add( new SelectOption('','-- Select a Group --'));
         
-        for( CollaborationGroup cg : [select id, name, membercount from CollaborationGroup order by name asc, membercount desc limit :( isTest ? 5 : 990 )] )
+        for( CollaborationGroup cg : [select id, name, membercount from CollaborationGroup order by name asc, membercount desc limit :( isTest ? 5 : 10000 )] )
             so.add( new SelectOption( cg.id, cg.name +' ('+ cg.membercount + ( cg.membercount > 1 ? ' members' : ' member' ) + ')' ) );
             
         return so;
@@ -352,7 +352,7 @@ public with sharing class groupMaster {
     Profile[] ps = [select id, name
         from Profile
         where usertype = 'Standard' or usertype = 'CSNOnly'
-        order by name asc limit :( isTest ? 5 : 990 )];
+        order by name asc limit :( isTest ? 5 : 10000 )];
     
     for( Profile p : ps )
         so.add( new SelectOption( p.id, p.name ) );
@@ -369,7 +369,7 @@ public with sharing class groupMaster {
     UserRole[] rs = [select id, name
         from UserRole
         where portaltype = 'None'
-        order by name asc limit :( isTest ? 5 : 990 )];
+        order by name asc limit :( isTest ? 5 : 10000 )];
     
     for( UserRole r : rs )
         so.add( new SelectOption( r.id, r.name ) );

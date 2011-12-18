@@ -1,5 +1,5 @@
 <!-- Jonathan Hersh - jhersh@salesforce.com - Feb '11 -->
-<apex:page tabstyle="GroupMaster__tab" sidebar="false" controller="groupMaster" standardstylesheets="false">
+<apex:page tabstyle="GroupMaster__tab" sidebar="false" controller="groupMaster" standardstylesheets="false" readOnly="true">
     <apex:includescript value="{!URLFOR( $Resource.groupMaster, 'jquery-1.4.4.min.js' )}" />
     <apex:includescript value="{!URLFOR( $Resource.groupMaster, 'jquery-ui-1.8.9.custom.min.js' )}" />
     <apex:stylesheet value="{!URLFOR( $Resource.groupMaster, 'jquery-ui-1.8.9.custom.css' )}" />
